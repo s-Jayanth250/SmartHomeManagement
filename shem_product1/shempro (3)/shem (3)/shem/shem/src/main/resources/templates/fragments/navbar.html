@@ -1,0 +1,34 @@
+<nav th:fragment="header" class="navbar navbar-expand-lg navbar-dark bg-dark px-4 shadow">
+    <a class="navbar-brand fw-bold" href="#">
+        <i class="fa-solid fa-bolt text-warning"></i> Smart Energy
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+
+            <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                <a class="nav-link" href="/admin/dashboard">Owner Dashboard</a>
+            </li>
+
+            <li class="nav-item" sec:authorize="hasRole('ELECTRICIAN')">
+                <a class="nav-link" href="/electrician/dashboard">Electrician Panel</a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link" href="/analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a>
+            </li>
+
+            <li class="nav-item ms-2">
+                <span class="text-light small me-2">
+                    User: <span sec:authentication="name">User</span>
+                </span>
+                <a href="/logout" class="btn btn-danger btn-sm rounded-pill">Logout</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+</nav>

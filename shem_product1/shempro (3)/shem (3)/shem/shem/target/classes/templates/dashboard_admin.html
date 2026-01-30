@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>SHEMS Admin</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <div class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-bolt text-warning"></i> SHEMS
+        </div>
+
+        <a href="#" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a>
+        <a href="#usersSection"><i class="fa-solid fa-users"></i> Users & Devices</a>
+        <a href="#automationSection"><i class="fa-solid fa-robot"></i> Automation</a>
+        <a href="#reportingSection"><i class="fa-solid fa-chart-line"></i> Analytics & Graphs</a>
+
+        <div class="mt-auto">
+            <a href="/logout" class="text-danger"><i class="fa-solid fa-sign-out-alt"></i> Logout</a>
+        </div>
+    </div>
+
+    <div class="main-content">
+
+        <div class="header-bar">
+            <div>
+                <h4 class="fw-bold mb-0">Admin Overview</h4>
+                <p class="text-muted small">Welcome back, Owner.</p>
+            </div>
+            <div>
+                <button onclick="window.print()" class="btn btn-pdf rounded-pill px-4 shadow-sm">
+                    <i class="fa-solid fa-file-pdf me-2"></i> Download Report (PDF)
+                </button>
+            </div>
+        </div>
+
+        <div id="usersSection" class="content-card mb-4">
+            <h5 class="fw-bold text-primary mb-3"><i class="fa-solid fa-list-check"></i> Device Activity Report</h5>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                    <tr>
+                        <th>Device Name</th>
+                        <th>Type</th>
+                        <th>Location</th>
+                        <th>Owner (User)</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="device : ${devices}">
+                        <td class="fw-bold" th:text="${device.name}">Name</td>
+                        <td><span class="badge bg-light text-dark border" th:text="${device.type}">Type</span></td>
+                        <td th:text="${device.location}">Room</td>
+                        <td class="text-info fw-bold" th:text="${device.addedBy != null ? device.addedBy : 'System'}">User</td>
+                        <td>
+                            <span class="badge" th:classappend="${device.status == 'ON' ? 'bg-success' : 'bg-danger'}" th:text="${device.status}">OFF</span>
+                        </td>
+                        <td>
+                            <a th:href="@{'/device/toggle/' + ${device.id}}" class="btn btn-sm btn-outline-primary">Toggle</a>
+                            <a th:href="@{'/admin/delete-device/' + ${device.id}}" class="btn btn-sm btn-outline-danger ms-1"><i class="fa-solid fa-trash"></i></a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="automationSection" class="row mb-4">
+            <div class="col-md-6">
+                <div class="content-card h-100">
+                    <h5 class="fw-bold text-warning"><i class="fa-solid fa-clock"></i> Automation Rules</h5>
+                    <p class="text-muted small">Set automatic schedules for devices.</p>
+                    <form th:action="@{/admin/schedule-device}" method="post">
+                        <div class="mb-2">
+                            <label class="small">Select Device</label>
+                            <select name="deviceId" class="form-select">
+                                <option th:each="d : ${devices}" th:value="${d.id}" th:text="${d.name}"></option>
+                            </select>
+                        </div>
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Action</span>
+                            <select name="action" class="form-select">
+                                <option value="ON">Turn ON</option>
+                                <option value="OFF">Turn OFF</option>
+                            </select>
+                            <input type="datetime-local" name="scheduledTime" class="form-control">
+                            <button class="btn btn-warning">Set Rule</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="content-card h-100 bg-primary text-white">
+                    <h5 class="fw-bold"><i class="fa-solid fa-users"></i> User Management</h5>
+                    <p class="small text-white-50">Manage registered users.</p>
+                    <div class="list-group">
+                        <div th:each="user : ${users}" class="list-group-item d-flex justify-content-between align-items-center bg-transparent text-white border-light">
+                            <span>
+                                <i class="fa-solid fa-user me-2"></i> <span th:text="${user.name}">Name</span>
+                                <small class="d-block text-white-50" th:text="${user.role}">Role</small>
+                            </span>
+                            <a th:if="${user.role != 'ROLE_ADMIN'}" th:href="@{'/admin/delete-user/' + ${user.id}}" class="btn btn-sm btn-danger"><i class="fa-solid fa-xmark"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="reportingSection" class="content-card">
+            <h5 class="fw-bold text-success"><i class="fa-solid fa-chart-pie"></i> Energy Analytics</h5>
+            <canvas id="energyChart" style="max-height: 300px;"></canvas>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    const ctx = document.getElementById('energyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['AC', 'Lights', 'Fan', 'Kitchen', 'TV'],
+            datasets: [{
+                label: 'Energy Consumption (kWh)',
+                data: [12, 19, 3, 5, 2], // Dummy data for demo
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
+            }]
+        },
+        options: { responsive: true }
+    });
+</script>
+
+</body>
+</html>
