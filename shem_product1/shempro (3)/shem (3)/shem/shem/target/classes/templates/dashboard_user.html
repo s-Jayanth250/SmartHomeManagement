@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>My Home Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; }
+        .dashboard-nav { background: white; padding: 15px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .bill-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; border-radius: 15px; padding: 25px;
+            box-shadow: 0 10px 20px rgba(118, 75, 162, 0.3);
+            position: relative; overflow: hidden;
+        }
+        .bill-card::after {
+            content: '\f156'; font-family: "Font Awesome 6 Free"; font-weight: 900;
+            position: absolute; right: -20px; bottom: -30px;
+            font-size: 150px; opacity: 0.1; color: white;
+        }
+        .device-card {
+            background: white; border: none; border-radius: 15px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02); transition: transform 0.2s;
+        }
+        .device-card:hover { transform: translateY(-5px); }
+    </style>
+</head>
+<body>
+
+<nav class="dashboard-nav d-flex justify-content-between align-items-center mb-4">
+    <h4 class="m-0 fw-bold text-primary"><i class="fa-solid fa-house-chimney"></i> My Smart Home</h4>
+    <a href="/logout" class="btn btn-outline-danger btn-sm rounded-pill px-4">Logout</a>
+</nav>
+
+<div class="container">
+
+    <div class="row mb-5">
+        <div class="col-md-6 offset-md-3">
+            <div class="bill-card text-center">
+                <h5 class="text-white-50 text-uppercase small ls-1">Current Month Bill Estimate</h5>
+                <h1 class="display-3 fw-bold my-2">
+                    ₹<span th:text="${currentBill}">0.00</span>
+                </h1>
+                <p class="mb-4">Total Usage: <span th:text="${totalUnits}">0</span> Units (kWh) @ ₹8/Unit</p>
+
+                <button class="btn btn-light text-primary fw-bold rounded-pill px-5 py-2 shadow-sm"
+                        onclick="alert('Redirecting to Payment Gateway (PhonePe/GPay)...')">
+                    <i class="fa-solid fa-credit-card me-2"></i> Pay Bill Now
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <h5 class="text-muted mb-3 ms-2">Connected Devices</h5>
+    <div class="row">
+        <div class="col-md-3 mb-4" th:each="device : ${devices}">
+            <div class="device-card text-center">
+                <div class="mb-3 text-secondary">
+                    <i class="fa-solid fa-3x"
+                       th:classappend="${device.type == 'AC' ? 'fa-snowflake text-info' :
+                                       (device.type == 'Light' ? 'fa-lightbulb text-warning' : 'fa-fan')}"></i>
+                </div>
+
+                <h5 class="fw-bold mb-1" th:text="${device.name}">Device Name</h5>
+                <p class="small text-muted mb-3" th:text="${device.location}">Room</p>
+
+                <a th:href="@{'/device/toggle/' + ${device.id}}"
+                   class="btn w-100 rounded-pill fw-bold"
+                   th:classappend="${device.status == 'ON' ? 'btn-success' : 'btn-outline-secondary'}"
+                   th:text="${device.status == 'ON' ? 'ON' : 'OFF'}">
+                </a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

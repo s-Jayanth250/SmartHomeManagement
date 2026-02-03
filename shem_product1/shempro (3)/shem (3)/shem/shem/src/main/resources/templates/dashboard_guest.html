@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Guest Suite</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>body { background: #f8f9fa; }</style>
+</head>
+<body>
+
+<nav class="navbar navbar-light bg-white shadow-sm px-4 mb-4">
+    <span class="navbar-brand fw-bold text-primary"><i class="fa-solid fa-hotel"></i> Guest Portal</span>
+    <a href="/logout" class="btn btn-outline-secondary btn-sm">Logout</a>
+</nav>
+
+<div class="container">
+
+    <div class="card p-3 mb-4 border-0 shadow-sm">
+        <h6 class="fw-bold text-muted">Add Personal Device</h6>
+        <form th:action="@{/device/add}" method="post" class="row g-2">
+            <div class="col-md-4"><input type="text" name="name" class="form-control form-control-sm" placeholder="Device Name (e.g. Laptop)" required></div>
+            <div class="col-md-3">
+                <select name="type" class="form-select form-select-sm">
+                    <option value="Laptop">Laptop</option>
+                    <option value="Charger">Charger</option>
+                    <option value="Speaker">Speaker</option>
+                </select>
+            </div>
+            <div class="col-md-3"><input type="number" name="powerRating" class="form-control form-control-sm" placeholder="Watts (e.g. 65)" required></div>
+            <div class="col-md-2"><button class="btn btn-primary btn-sm w-100">Add</button></div>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4" th:each="device : ${devices}">
+            <div class="card p-3 text-center border-0 shadow-sm h-100">
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted" th:text="${device.addedBy != null ? device.addedBy : 'System'}">User</small>
+                    <span class="badge bg-light text-dark" th:text="${device.status}">OFF</span>
+                </div>
+                <i class="fa-solid fa-plug fa-3x my-3 text-secondary" th:classappend="${device.status == 'ON' ? 'text-success' : ''}"></i>
+                <h5 th:text="${device.name}">Name</h5>
+
+                <a th:href="@{'/device/toggle/' + ${device.id}}"
+                   class="btn btn-sm w-100 mt-2 rounded-pill fw-bold"
+                   th:classappend="${device.status == 'ON' ? 'btn-success' : 'btn-outline-dark'}"
+                   th:text="${device.status == 'ON' ? 'Turn OFF' : 'Turn ON'}">Action</a>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

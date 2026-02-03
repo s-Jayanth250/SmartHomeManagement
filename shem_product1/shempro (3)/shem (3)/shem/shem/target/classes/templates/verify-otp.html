@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Verify OTP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-auth-login">
+
+<div class="login-card-glass text-center p-4">
+    <h3 class="fw-bold mb-3">Verify & Reset</h3>
+
+    <div th:if="${message}" class="alert alert-success small p-2 rounded-3" th:text="${message}"></div>
+    <div th:if="${error}" class="alert alert-danger small p-2 rounded-3" th:text="${error}"></div>
+
+    <form th:action="@{/verify-otp}" method="post">
+        <input type="hidden" name="email" th:value="${email}">
+
+        <div class="form-floating mb-3">
+            <input type="text" name="otp" class="form-control text-center fw-bold fs-4" placeholder="Code" maxlength="6" required>
+            <label>OTP Code</label>
+        </div>
+
+        <div class="form-floating mb-2">
+            <input type="password" name="newPassword" class="form-control" placeholder="New Pass" required>
+            <label>New Password</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="password" name="confirmPassword" class="form-control" placeholder="Confirm" required>
+            <label>Confirm Password</label>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 py-2 rounded-pill fw-bold">Reset Password</button>
+    </form>
+</div>
+</body>
+</html>
